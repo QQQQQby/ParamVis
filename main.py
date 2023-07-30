@@ -17,8 +17,8 @@ class MainWindow(QMainWindow):
             ['radius', 'Radius:', 1, 1000, 1, 100]
         ]),
         ('Hypotrochoid', HypotrochoidParamEq, [
-            ['R', 'R:', 50, 1000, 1, 500],
-            ['k', 'k:', 0.001, 1, 0.01, 1],
+            ['R', 'R:', 50, 1000, 1, 100],
+            ['k', 'k:', 0.001, 1, 0.01, 0.5],
             ['l', 'l:', 0.001, 2, 0.001, 1],
         ])
     ]

@@ -39,7 +39,7 @@ class CircleParamEq(ParamEq):
 class HypotrochoidParamEq(ParamEq):
     def get_points(self) -> List[Tuple[int, int]]:
         end = self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R))
-        thetas = np.linspace(0, end, 100000)
+        thetas = np.linspace(0, end, 10000)
         xs = self.R * ((1 - self.k) * np.cos(thetas) + self.l * self.k * np.cos((1 - self.k) / self.k * thetas))
         ys = self.R * ((1 - self.k) * np.sin(thetas) + self.l * self.k * np.sin((1 - self.k) / self.k * thetas))
         return [tuple(p) for p in zip(xs, ys)]
