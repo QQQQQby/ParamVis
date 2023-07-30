@@ -8,17 +8,18 @@ from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QAppli
 
 from display_widgets import ParamEqDisplayWidget
 from option_widgets import OptionWidget
-from param_eqs import CircleParamEq, HypocycloidParamEq
+from param_eqs import CircleParamEq, HypotrochoidParamEq
 
 
 class MainWindow(QMainWindow):
     selector = [
         ('Circle', CircleParamEq, [
-            ['radius', 'Radius:', 0, 1000, 100]
+            ['radius', 'Radius:', 1, 1000, 1, 100]
         ]),
-        ('Hypocycloid', HypocycloidParamEq, [
-            ['a', 'a:', 0, 1000, 100],
-            ['b', 'b:', 0, 1000, 100]
+        ('Hypotrochoid', HypotrochoidParamEq, [
+            ['R', 'R:', 50, 1000, 1, 500],
+            ['k', 'k:', 0.001, 1, 0.01, 1],
+            ['l', 'l:', 0.001, 2, 0.001, 1],
         ])
     ]
 
