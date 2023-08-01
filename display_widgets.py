@@ -11,12 +11,6 @@ class ParamEqDisplayWidget(QWidget):
         self.setMinimumSize(400, 400)
 
         self.param_eq = None
-        self.do_show_image = False
-
-    def show_image(self, flag):
-        self.do_show_image = flag
-        if flag:
-            self.repaint()
 
     def set_param_eq(self, param_eq_type, *args, do_repaint=True):
         self.param_eq = param_eq_type(*args)
@@ -42,7 +36,7 @@ class ParamEqDisplayWidget(QWidget):
         painter.drawLine(0, self.height() - 1, self.width(), self.height())
 
         # Draw Param Eq
-        if self.param_eq is not None and self.do_show_image:
+        if self.param_eq is not None:
             points = self.param_eq.get_points()
             center = QPoint(self.width() // 2, self.height() // 2)
             path = QPainterPath()

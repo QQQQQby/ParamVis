@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import List, Tuple
 
 import numpy as np
@@ -63,4 +64,4 @@ class LineParamEq(ParamEq):
         ]
 
     def param_values(self) -> List[np.ndarray]:
-        return [np.array(-10000, 10000)]
+        return [np.array([-10000, 10000])]
