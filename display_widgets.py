@@ -10,8 +10,7 @@ class ParamEqDisplayWidget(QWidget):
         super().__init__(parent, *args, **kwargs)
         self.setMinimumSize(400, 400)
 
-        self.param_eq_type = None
-        self.param_eq_args = dict()
+        self.param_eq = None
         self.do_show_image = False
 
     def show_image(self, flag):
@@ -19,14 +18,17 @@ class ParamEqDisplayWidget(QWidget):
         if flag:
             self.repaint()
 
-    def set_param_eq(self, param_eq_type):
-        self.param_eq_type = param_eq_type()
-        self.repaint()
+    def set_param_eq(self, param_eq_type, *args, do_repaint=True):
+        self.param_eq = param_eq_type(*args)
+        if do_repaint:
+            self.repaint()
 
-    def set_param(self, key: str, value: Union[int, float]):
-        assert self.param_eq_type is not None
-        setattr(self.param_eq_type, key, value)
-        self.repaint()
+    def set_param_eq_args(self, key: str, value: Union[int, float], do_repaint=True):
+        if self.param_eq is None:
+            raise RuntimeError('Parametric equation is None!')
+        setattr(self.param_eq, key, value)
+        if do_repaint:
+            self.repaint()
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter()
@@ -40,8 +42,8 @@ class ParamEqDisplayWidget(QWidget):
         painter.drawLine(0, self.height() - 1, self.width(), self.height())
 
         # Draw Param Eq
-        if self.param_eq_type is not None and self.do_show_image:
-            points = self.param_eq_type.get_points()
+        if self.param_eq is not None and self.do_show_image:
+            points = self.param_eq.get_points()
             center = QPoint(self.width() // 2, self.height() // 2)
             path = QPainterPath()
 

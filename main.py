@@ -3,8 +3,8 @@
 import sys
 
 from PySide2.QtCore import QRect
-from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QApplication, QVBoxLayout, QPushButton, \
-    QHBoxLayout, QComboBox
+from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QApplication, QVBoxLayout, QHBoxLayout, \
+    QComboBox
 
 from display_widgets import ParamEqDisplayWidget
 from option_widgets import OptionWidget
@@ -12,7 +12,7 @@ from param_eqs import CircleParamEq, HypotrochoidParamEq
 
 
 class MainWindow(QMainWindow):
-    selector = [
+    options = [
         ('Circle', CircleParamEq, [
             ['radius', 'Radius:', 1, 1000, 1, 100]
         ]),
@@ -39,20 +39,18 @@ class MainWindow(QMainWindow):
 
         # choices
         self.combo_box_choices = QComboBox(self)
-        self.combo_box_choices.addItems(item[0] for item in MainWindow.selector)
+        self.combo_box_choices.addItems(item[0] for item in MainWindow.options)
         self.combo_box_choices.currentIndexChanged.connect(self.on_choice_changed)
         choice_layout = QHBoxLayout()
         choice_layout.addStretch(1)
         choice_layout.addWidget(self.combo_box_choices)
         choice_layout.addStretch(1)
 
-        # options
-        self.option_widget = OptionWidget(self)
-
-        # display
+        # options and display
         self.param_eq_display_widget = ParamEqDisplayWidget(self)
-        self.param_eq_display_widget.set_param_eq(MainWindow.selector[0][1])
-        self.option_widget.set_param_eq_widget(self.param_eq_display_widget, MainWindow.selector[0][2])
+        self.option_widget = OptionWidget(self, self.param_eq_display_widget)
+        self.option_widget.set_param_eq_option(MainWindow.options[0])
+
         self.param_eq_display_widget.show_image(True)
 
         # all
@@ -65,10 +63,7 @@ class MainWindow(QMainWindow):
         self.central_widget.setLayout(layout)
 
     def on_choice_changed(self, idx):
-        self.param_eq_display_widget.show_image(False)
-        self.param_eq_display_widget.set_param_eq(MainWindow.selector[idx][1])
-        self.option_widget.set_param_eq_widget(self.param_eq_display_widget, MainWindow.selector[idx][2])
-        self.param_eq_display_widget.show_image(True)
+        self.option_widget.set_param_eq_option(MainWindow.options[idx])
 
 
 if __name__ == '__main__':
