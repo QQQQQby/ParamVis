@@ -1,17 +1,17 @@
-from typing import Union, Optional
+from typing import Union
 
 from PySide2.QtCore import QPoint
 from PySide2.QtGui import QPaintEvent, QPainter, QPen, QColor, QPainterPath
 from PySide2.QtWidgets import QWidget
-
-from param_eqs import ParamEq
 
 
 class ParamEqDisplayWidget(QWidget):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.setMinimumSize(400, 400)
-        self.param_eq = None
+
+        self.param_eq_type = None
+        self.param_eq_args = dict()
         self.do_show_image = False
 
     def show_image(self, flag):
@@ -19,13 +19,13 @@ class ParamEqDisplayWidget(QWidget):
         if flag:
             self.repaint()
 
-    def set_param_eq(self, param_eq: Optional[ParamEq]):
-        self.param_eq = param_eq
+    def set_param_eq(self, param_eq_type):
+        self.param_eq_type = param_eq_type()
         self.repaint()
 
     def set_param(self, key: str, value: Union[int, float]):
-        assert self.param_eq is not None
-        setattr(self.param_eq, key, value)
+        assert self.param_eq_type is not None
+        setattr(self.param_eq_type, key, value)
         self.repaint()
 
     def paintEvent(self, event: QPaintEvent) -> None:
@@ -40,8 +40,8 @@ class ParamEqDisplayWidget(QWidget):
         painter.drawLine(0, self.height() - 1, self.width(), self.height())
 
         # Draw Param Eq
-        if self.param_eq is not None and self.do_show_image:
-            points = self.param_eq.get_points()
+        if self.param_eq_type is not None and self.do_show_image:
+            points = self.param_eq_type.get_points()
             center = QPoint(self.width() // 2, self.height() // 2)
             path = QPainterPath()
 

@@ -1,45 +1,66 @@
-import math
 from typing import List, Tuple
 
 import numpy as np
 
 
 class ParamEq:
-    def __init__(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-    def __setattr__(self, key, value):
-        super().__setattr__(key, value)
-
-    def __getattr__(self, key):
-        return self.__dict__.get(key, 0)
-
-    def get_points(self) -> List[Tuple[int, int]]:
+    def eq(self, *params) -> List[np.ndarray]:
         raise NotImplementedError
+
+    def param_values(self) -> List[np.ndarray]:
+        raise NotImplementedError
+
+    def get_points(self) -> List[Tuple]:
+        param_values = self.param_values()
+        points = None
+        if len(param_values) == 1:
+            points = self.eq(param_values[0])
+        elif len(param_values) == 2:
+            raise NotImplementedError
+        return [tuple(p) for p in zip(*points)]
 
 
 class CircleParamEq(ParamEq):
-    def __init__(self, **kwargs):
-        super().__init__(radius=10, **kwargs)
+    def __init__(self, radius):
+        self.radius = radius
 
-    def get_points(self) -> List[Tuple[int, int]]:
-        theta = 0
-        end = 2 * math.pi
-        ans = []
-        while theta < end:
-            ans.append((
-                self.radius * math.cos(theta),
-                self.radius * math.sin(theta)
-            ))
-            theta += 0.001
-        return ans
+    def eq(self, thetas) -> List[np.ndarray]:
+        return [
+            self.radius * np.cos(thetas),
+            self.radius * np.sin(thetas)
+        ]
+
+    def param_values(self) -> List[np.ndarray]:
+        return [np.linspace(0, 2 * np.pi, 10000)]
 
 
 class HypotrochoidParamEq(ParamEq):
-    def get_points(self) -> List[Tuple[int, int]]:
-        end = self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R))
-        thetas = np.linspace(0, end, 10000)
-        xs = self.R * ((1 - self.k) * np.cos(thetas) + self.l * self.k * np.cos((1 - self.k) / self.k * thetas))
-        ys = self.R * ((1 - self.k) * np.sin(thetas) + self.l * self.k * np.sin((1 - self.k) / self.k * thetas))
-        return [tuple(p) for p in zip(xs, ys)]
+    def __init__(self, R, k, l):
+        self.R = R
+        self.k = k
+        self.l = l
+
+    def eq(self, thetas) -> List[np.ndarray]:
+        return [
+            self.R * ((1 - self.k) * np.cos(thetas) + self.l * self.k * np.cos((1 - self.k) / self.k * thetas)),
+            self.R * ((1 - self.k) * np.sin(thetas) + self.l * self.k * np.sin((1 - self.k) / self.k * thetas))
+        ]
+
+    def param_values(self) -> List[np.ndarray]:
+        return [np.linspace(0, self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R)), 10000)]
+
+
+class LineParamEq(ParamEq):
+    def __init__(self, x0, y0, a):
+        self.x0 = x0
+        self.y0 = y0
+        self.a = a
+
+    def eq(self, ts) -> List[np.ndarray]:
+        return [
+            self.x0 + np.cos(self.a) * ts,
+            self.y0 + np.sin(self.a) * ts
+        ]
+
+    def param_values(self) -> List[np.ndarray]:
+        return [np.array(-10000, 10000)]

@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
 
         # display
         self.param_eq_display_widget = ParamEqDisplayWidget(self)
-        self.param_eq_display_widget.set_param_eq(MainWindow.selector[0][1]())
+        self.param_eq_display_widget.set_param_eq(MainWindow.selector[0][1])
         self.option_widget.set_param_eq_widget(self.param_eq_display_widget, MainWindow.selector[0][2])
         self.param_eq_display_widget.show_image(True)
 
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
 
     def on_choice_changed(self, idx):
         self.param_eq_display_widget.show_image(False)
-        self.param_eq_display_widget.set_param_eq(MainWindow.selector[idx][1]())
+        self.param_eq_display_widget.set_param_eq(MainWindow.selector[idx][1])
         self.option_widget.set_param_eq_widget(self.param_eq_display_widget, MainWindow.selector[idx][2])
         self.param_eq_display_widget.show_image(True)
 

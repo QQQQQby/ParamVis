@@ -14,7 +14,7 @@ class OptionWidget(QWidget):
         self.main_layout = QGridLayout(self)
         self.setLayout(self.main_layout)
 
-    def set_param_eq_widget(self, param_eq_widget: ParamEqDisplayWidget, options: List[List]):
+    def set_param_eq_widget(self, param_eq_widget: ParamEqDisplayWidget, options):
         clear_layout(self.main_layout)
 
         def make_slider_callback(key):
