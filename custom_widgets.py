@@ -38,6 +38,12 @@ class DoubleSlider(QSlider):
         self._max = value
         self._range_adjusted()
 
+    def maximum(self) -> float:
+        return self._max
+
+    def minimum(self) -> float:
+        return self._min
+
     def setInterval(self, value):
         # To avoid division by zero
         if not value:

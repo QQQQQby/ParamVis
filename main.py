@@ -2,7 +2,6 @@
 
 import sys
 
-import numpy as np
 from PySide2.QtCore import QRect
 from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QApplication, QVBoxLayout, QHBoxLayout, \
     QComboBox
@@ -15,7 +14,9 @@ from param_eqs import CircleParamEq, HypotrochoidParamEq, LineParamEq
 class MainWindow(QMainWindow):
     options = [
         ('Circle', CircleParamEq, [
-            ['radius', 'Radius:', 1, 1000, 1, 100]
+            ['r', 'r:', 0.5, 500, 1, 100],
+            ['x0', 'x0:', -500, 500, 0.1, 0],
+            ['y0', 'y0:', -500, 500, 0.1, 0]
         ]),
         ('Hypotrochoid', HypotrochoidParamEq, [
             ['R', 'R:', 50, 1000, 1, 100],
@@ -25,7 +26,7 @@ class MainWindow(QMainWindow):
         ('Line', LineParamEq, [
             ['x0', 'x0:', -50, 50, 1, 0],
             ['y0', 'y0:', -50, 50, 1, 0],
-            ['a', 'a:', 0, 3.15, 0.01, np.pi / 4],
+            ['k', 'k:', -2, 2, 0.1, 0.25],
         ])
     ]
 

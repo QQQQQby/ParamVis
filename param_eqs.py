@@ -1,4 +1,3 @@
-from functools import lru_cache
 from typing import List, Tuple
 
 import numpy as np
@@ -22,13 +21,15 @@ class ParamEq:
 
 
 class CircleParamEq(ParamEq):
-    def __init__(self, radius):
-        self.radius = radius
+    def __init__(self, r, x0, y0):
+        self.r = r
+        self.x0 = x0
+        self.y0 = y0
 
     def eq(self, thetas) -> List[np.ndarray]:
         return [
-            self.radius * np.cos(thetas),
-            self.radius * np.sin(thetas)
+            self.x0 + self.r * np.cos(thetas),
+            self.y0 + self.r * np.sin(thetas)
         ]
 
     def param_values(self) -> List[np.ndarray]:
@@ -52,15 +53,15 @@ class HypotrochoidParamEq(ParamEq):
 
 
 class LineParamEq(ParamEq):
-    def __init__(self, x0, y0, a):
+    def __init__(self, x0, y0, k):
         self.x0 = x0
         self.y0 = y0
-        self.a = a
+        self.k = k
 
     def eq(self, ts) -> List[np.ndarray]:
         return [
-            self.x0 + np.cos(self.a) * ts,
-            self.y0 + np.sin(self.a) * ts
+            self.x0 + np.cos(self.k * np.pi) * ts,
+            self.y0 + np.sin(self.k * np.pi) * ts
         ]
 
     def param_values(self) -> List[np.ndarray]:

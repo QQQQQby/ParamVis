@@ -1,11 +1,23 @@
 from typing import Union
 
-from PySide2.QtCore import QPointF
-from PySide2.QtGui import QPaintEvent, QPainter, QPen, QColor, QPainterPath, QMouseEvent, QTransform, QWheelEvent
+from PySide2.QtCore import QPoint
+from PySide2.QtGui import QPaintEvent, QPainter, QPen, QColor, QPainterPath, QMouseEvent, QTransform, QWheelEvent, \
+    QFontMetrics, QFont
 from PySide2.QtWidgets import QWidget
 
 
 class ParamEqDisplayWidget(QWidget):
+    scale_range = (0.1, 500)
+    scale_step = 1.1
+    scales_to_intervals = [
+        [100, 1], [50, 2], [20, 5],
+        [10, 10], [5, 20], [2, 50],
+        [1, 100], [0.5, 200], [0.2, 500], [0, 1000]
+    ]
+    tick_length = 10
+    x_tick_margin = 5
+    y_tick_margin = 10
+
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.setMinimumSize(400, 400)
@@ -20,7 +32,7 @@ class ParamEqDisplayWidget(QWidget):
         self.transform_move.scale(1, -1)
         self.prev_moved = None
 
-        self.interval = 10
+        self.interval = 100
 
     def set_param_eq(self, param_eq_type, *args, do_repaint=True):
         self.param_eq = param_eq_type(*args)
@@ -36,38 +48,42 @@ class ParamEqDisplayWidget(QWidget):
         if do_repaint:
             self.repaint()
 
-    def calc_real_coord(self, p: QPointF) -> QPointF:
+    def calc_real_coord(self, p: QPoint) -> QPoint:
         return self.transform_move.map(self.transform_scale.map(p))
 
     def wheelEvent(self, event: QWheelEvent) -> None:
-        scale_range = (0.25, 10)
-        step = 1.1
 
         angle = event.angleDelta() / 8
         angleY = angle.y()
         if angleY > 0:  # Zoom in
-            self.transform_scale.scale(step, step)
+            self.transform_scale.scale(self.scale_step, self.scale_step)
             scale = self.transform_scale.m11()
-            if scale > scale_range[1]:
-                t = scale_range[1] / scale
+            if scale > self.scale_range[1]:
+                t = self.scale_range[1] / scale
                 self.transform_scale.scale(t, t)
 
         else:  # Zoom out
-            self.transform_scale.scale(1 / step, 1 / step)
+            self.transform_scale.scale(1 / self.scale_step, 1 / self.scale_step)
             scale = self.transform_scale.m11()
-            if scale < scale_range[0]:
-                t = scale_range[0] / scale
+            if scale < self.scale_range[0]:
+                t = self.scale_range[0] / scale
                 self.transform_scale.scale(t, t)
+
+        scale = self.transform_scale.m11()
+        i = 0
+        while i < len(self.scales_to_intervals) and self.scales_to_intervals[i][0] > scale:
+            i += 1
+        self.interval = self.scales_to_intervals[i][1]
 
         self.repaint()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.prev_moved = QPointF(event.x(), event.y())
+        self.prev_moved = QPoint(event.x(), event.y())
         self.repaint()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         if self.prev_moved:
-            curr_moved = QPointF(event.pos())
+            curr_moved = QPoint(event.pos())
             offset = curr_moved - self.prev_moved
             self.transform_move.translate(offset.x(), -offset.y())
             self.prev_moved = curr_moved
@@ -83,51 +99,81 @@ class ParamEqDisplayWidget(QWidget):
 
         # Draw axis
         painter.setPen(QPen(QColor(128, 128, 128), 3))
-        center = self.calc_real_coord(QPointF(0, 0))
+        center = self.calc_real_coord(QPoint(0, 0))
         painter.drawLine(center.x(), 0, center.x(), self.height() - 1)
         painter.drawLine(0, center.y(), self.width() - 1, center.y())
 
         # Draw ticks
-        tick_length = 5
+        label_font = QFont('Times New Romans', 16, QFont.Bold)
+        painter.setFont(label_font)
+        label_font_metrics = QFontMetrics(label_font)
 
         i = self.interval
         while True:
-            p0 = self.calc_real_coord(QPointF(i, 0))
+            p0 = self.calc_real_coord(QPoint(i, 0))
             if p0.x() >= self.width():
                 break
-            p1 = QPointF(p0)
-            p1.setY(p0.y() - tick_length)
+            p1 = QPoint(p0)
+            p1.setY(p0.y() - self.tick_length)
             painter.drawLine(p0, p1)
+
+            label_str = str(i)
+            label_rect = label_font_metrics.boundingRect(label_str)
+            label_rect.moveCenter(p0)
+            label_rect.moveTop(p0.y() + self.x_tick_margin)
+            painter.drawText(label_rect.bottomLeft(), label_str)
+
             i += self.interval
 
         i = -self.interval
         while True:
-            p0 = self.calc_real_coord(QPointF(i, 0))
+            p0 = self.calc_real_coord(QPoint(i, 0))
             if p0.x() < 0:
                 break
-            p1 = QPointF(p0)
-            p1.setY(p0.y() - tick_length)
+            p1 = QPoint(p0)
+            p1.setY(p0.y() - self.tick_length)
             painter.drawLine(p0, p1)
+
+            label_str = str(i)
+            label_rect = label_font_metrics.boundingRect(label_str)
+            label_rect.moveCenter(p0)
+            label_rect.moveTop(p0.y() + self.x_tick_margin)
+            painter.drawText(label_rect.bottomLeft(), label_str)
+
             i -= self.interval
 
         i = self.interval
         while True:
-            p0 = self.calc_real_coord(QPointF(0, i))
+            p0 = self.calc_real_coord(QPoint(0, i))
             if p0.y() < 0:
                 break
-            p1 = QPointF(p0)
-            p1.setX(p0.x() + tick_length)
+            p1 = QPoint(p0)
+            p1.setX(p0.x() + self.tick_length)
             painter.drawLine(p0, p1)
+
+            label_str = str(i)
+            label_rect = label_font_metrics.boundingRect(label_str)
+            label_rect.moveCenter(p0)
+            label_rect.moveRight(p0.x() - self.y_tick_margin)
+            painter.drawText(label_rect.bottomLeft(), label_str)
+
             i += self.interval
 
         i = -self.interval
         while True:
-            p0 = self.calc_real_coord(QPointF(0, i))
+            p0 = self.calc_real_coord(QPoint(0, i))
             if p0.y() >= self.height():
                 break
-            p1 = QPointF(p0)
-            p1.setX(p0.x() + tick_length)
+            p1 = QPoint(p0)
+            p1.setX(p0.x() + self.tick_length)
             painter.drawLine(p0, p1)
+
+            label_str = str(i)
+            label_rect = label_font_metrics.boundingRect(label_str)
+            label_rect.moveCenter(p0)
+            label_rect.moveRight(p0.x() - self.y_tick_margin)
+            painter.drawText(label_rect.bottomLeft(), label_str)
+
             i -= self.interval
 
         # Draw Param Eq
@@ -135,9 +181,9 @@ class ParamEqDisplayWidget(QWidget):
 
         if self.points is not None:
             path = QPainterPath()
-            path.moveTo(self.calc_real_coord(QPointF(*self.points[0])))
+            path.moveTo(self.calc_real_coord(QPoint(*self.points[0])))
             for i in range(1, len(self.points)):
-                path.lineTo(self.calc_real_coord(QPointF(*self.points[i])))
+                path.lineTo(self.calc_real_coord(QPoint(*self.points[i])))
 
             painter.drawPath(path)
 
