@@ -2,42 +2,63 @@
 
 import sys
 
-from PySide2.QtCore import QRect
 from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QApplication, QVBoxLayout, QHBoxLayout, \
     QComboBox
 
 from display_widgets import ParamEqDisplayWidget
 from option_widgets import OptionWidget
-from param_eqs import CircleParamEq, HypotrochoidParamEq, LineParamEq
+from param_eqs import LineParamEq, CircleParamEq, HyperbolaParamEq, LemniscateParamEq, HypotrochoidParamEq, \
+    RoseCurveParamEq, LissajousParamEq, Extra1ParamEq
 
 
 class MainWindow(QMainWindow):
     options = [
+        ('Line', LineParamEq, [
+            ['x0', 'x0:', -500, 500, 5, 0],
+            ['y0', 'y0:', -500, 500, 5, 0],
+            ['k', 'k:', -2, 2, 0.05, 0.25]
+        ]),
         ('Circle', CircleParamEq, [
-            ['r', 'r:', 0.5, 500, 1, 100],
-            ['x0', 'x0:', -500, 500, 0.1, 0],
-            ['y0', 'y0:', -500, 500, 0.1, 0]
+            ['r', 'r:', 0.5, 500, 5, 100],
+            ['x0', 'x0:', -500, 500, 5, 0],
+            ['y0', 'y0:', -500, 500, 5, 0]
+        ]),
+        # ('Hyperbola', HyperbolaParamEq, [
+        #     ['a', 'a:', 0.5, 500, 5, 100],
+        #     ['b', 'b:', 0.5, 500, 5, 100],
+        #     ['x0', 'x0:', -500, 500, 5, 0],
+        #     ['y0', 'y0:', -500, 500, 5, 0]
+        # ]),
+        ('Lemniscate', LemniscateParamEq, [
+            ['a', 'a:', 1, 2, 0.05, 1]
         ]),
         ('Hypotrochoid', HypotrochoidParamEq, [
-            ['R', 'R:', 50, 1000, 1, 100],
-            ['k', 'k:', 0.01, 1, 0.01, 0.5],
-            ['l', 'l:', 0.01, 2, 0.01, 1],
+            ['R', 'R:', 50, 500, 5, 100],
+            ['k', 'k:', 0.05, 1, 0.05, 0.1],
+            ['l', 'l:', 0, 2, 0.05, 0]
         ]),
-        ('Line', LineParamEq, [
-            ['x0', 'x0:', -50, 50, 1, 0],
-            ['y0', 'y0:', -50, 50, 1, 0],
-            ['k', 'k:', -2, 2, 0.1, 0.25],
+        ('Rose Curve', RoseCurveParamEq, [
+            ['n', 'n:', 1, 50, 0.05, 1],
+            ['a', 'a:', 1, 3, 0.1, 2]
+        ]),
+        ('Lissajous', LissajousParamEq, [
+            ['n', 'n:', 0.1, 100, 0.05, 1],
+            ['phi', 'phi:', 0, 1.57, 0.01, 1],
+            ['a', 'a:', 50, 500, 5, 100],
+            ['b', 'b:', 50, 500, 5, 100]
+        ]),
+        ('Extra 1', Extra1ParamEq, [
+            ['a', 'a:', 1, 50, 0.01, 1]
         ])
     ]
 
     def __init__(self):
         super().__init__()
 
-        self.resize(640, 480)
+        self.resize(1024, 1024)
 
         # Menu bar
         self.menu_bar = QMenuBar(self)
-        self.menu_bar.setGeometry(QRect(0, 0, 640, 480))
         self.setMenuBar(self.menu_bar)
 
         # Status bar

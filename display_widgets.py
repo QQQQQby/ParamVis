@@ -1,6 +1,6 @@
 from typing import Union
 
-from PySide2.QtCore import QPoint
+from PySide2.QtCore import QPoint, QPointF
 from PySide2.QtGui import QPaintEvent, QPainter, QPen, QColor, QPainterPath, QMouseEvent, QTransform, QWheelEvent, \
     QFontMetrics, QFont
 from PySide2.QtWidgets import QWidget
@@ -21,6 +21,7 @@ class ParamEqDisplayWidget(QWidget):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.setMinimumSize(400, 400)
+        self.resize(1000, 600)
         self.setMouseTracking(True)
 
         self.param_eq = None
@@ -28,7 +29,7 @@ class ParamEqDisplayWidget(QWidget):
 
         self.transform_scale = QTransform()
         self.transform_move = QTransform()
-        self.transform_move.translate(200, 200)
+        self.transform_move.translate(500, 300)
         self.transform_move.scale(1, -1)
         self.prev_moved = None
 
@@ -48,7 +49,7 @@ class ParamEqDisplayWidget(QWidget):
         if do_repaint:
             self.repaint()
 
-    def calc_real_coord(self, p: QPoint) -> QPoint:
+    def calc_real_coord(self, p: Union[QPoint, QPointF]) -> Union[QPoint, QPointF]:
         return self.transform_move.map(self.transform_scale.map(p))
 
     def wheelEvent(self, event: QWheelEvent) -> None:
@@ -181,9 +182,9 @@ class ParamEqDisplayWidget(QWidget):
 
         if self.points is not None:
             path = QPainterPath()
-            path.moveTo(self.calc_real_coord(QPoint(*self.points[0])))
+            path.moveTo(self.calc_real_coord(QPointF(*self.points[0])))
             for i in range(1, len(self.points)):
-                path.lineTo(self.calc_real_coord(QPoint(*self.points[i])))
+                path.lineTo(self.calc_real_coord(QPointF(*self.points[i])))
 
             painter.drawPath(path)
 
