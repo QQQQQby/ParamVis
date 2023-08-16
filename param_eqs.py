@@ -7,13 +7,11 @@ class ParamEq:
     def eq(self, *params) -> List[np.ndarray]:
         raise NotImplementedError
 
-    def param_values(self) -> List[np.ndarray]:
+    def param_values(self) -> List[List[np.ndarray]]:
         raise NotImplementedError
 
-    def get_points(self) -> List[Tuple]:
-        param_values = self.param_values()
-        points = self.eq(*param_values)
-        return [tuple(p) for p in zip(*points)]
+    def get_curves(self) -> List[List[Tuple]]:
+        return [[tuple(p) for p in zip(*self.eq(*params))] for params in self.param_values()]
 
 
 class LineParamEq(ParamEq):
@@ -28,8 +26,8 @@ class LineParamEq(ParamEq):
             self.y0 + np.sin(self.k * np.pi) * ts
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.array([-10000, 10000])]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.array([-10000, 10000])]]
 
 
 class CircleParamEq(ParamEq):
@@ -44,8 +42,8 @@ class CircleParamEq(ParamEq):
             self.y0 + self.r * np.sin(thetas)
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(0, 2 * np.pi, 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(0, 2 * np.pi, 1000)]]
 
 
 class HyperbolaParamEq(ParamEq):
@@ -61,8 +59,9 @@ class HyperbolaParamEq(ParamEq):
             self.y0 + self.b * np.tan(thetas)
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(-np.pi / 2 + 1e-5, np.pi / 2 - 1e-5, 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(-np.pi / 2 + 1e-6, np.pi / 2 - 1e-6, 1000)],
+                [np.linspace(np.pi / 2 + 1e-6, np.pi * 3 / 2 - 1e-6, 1000)]]
 
 
 class LemniscateParamEq(ParamEq):
@@ -71,13 +70,13 @@ class LemniscateParamEq(ParamEq):
 
     def eq(self, thetas) -> List[np.ndarray]:
         return [
-            100 * self.a * np.cos(thetas) * np.sqrt(np.cos(2 * thetas)),
-            100 * self.a * np.sin(thetas) * np.sqrt(np.cos(2 * thetas))
+            self.a * np.cos(thetas) * np.sqrt(np.cos(2 * thetas)),
+            self.a * np.sin(thetas) * np.sqrt(np.cos(2 * thetas))
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.append(np.linspace(-np.pi / 4 + 1e-5, np.pi / 4 - 1e-5, 5000),
-                          np.linspace(np.pi * 3 / 4 + 1e-5, np.pi * 5 / 4 - 1e-5, 5000))]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(-np.pi / 4 + 1e-12, np.pi / 4 - 1e-12, 500)],
+                [np.linspace(np.pi * 3 / 4 + 1e-12, np.pi * 5 / 4 - 1e-12, 500)]]
 
 
 class HypotrochoidParamEq(ParamEq):
@@ -92,8 +91,8 @@ class HypotrochoidParamEq(ParamEq):
             self.R * ((1 - self.k) * np.sin(thetas) + self.l * self.k * np.sin((1 - self.k) / self.k * thetas))
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(0, self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R)), 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(0, self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R)), 10000)]]
 
 
 class RoseCurveParamEq(ParamEq):
@@ -103,12 +102,12 @@ class RoseCurveParamEq(ParamEq):
 
     def eq(self, thetas) -> List[np.ndarray]:
         return [
-            50 * self.a * np.sin(self.n * thetas) * np.cos(thetas),
-            50 * self.a * np.sin(self.n * thetas) * np.sin(thetas)
+            self.a * np.sin(self.n * thetas) * np.cos(thetas),
+            self.a * np.sin(self.n * thetas) * np.sin(thetas)
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(0, 2 * np.pi, 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(0, 2 * np.pi, 2000)]]
 
 
 class LissajousParamEq(ParamEq):
@@ -124,8 +123,8 @@ class LissajousParamEq(ParamEq):
             self.b * np.sin(self.n * ts + self.phi)
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(0, 2 * np.pi * np.lcm(int(self.n * 100), 100) / int(self.n * 100), 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(0, 2 * np.pi * np.lcm(int(self.n * 100), 100) / int(self.n * 100), 2000)]]
 
 
 class Extra1ParamEq(ParamEq):
@@ -134,9 +133,9 @@ class Extra1ParamEq(ParamEq):
 
     def eq(self, ts) -> List[np.ndarray]:
         return [
-            100 * np.sin(ts + np.cos(self.a * ts)),
-            100 * np.cos(ts + np.sin(self.a * ts))
+            np.sin(ts + np.cos(self.a * ts)),
+            np.cos(ts + np.sin(self.a * ts))
         ]
 
-    def param_values(self) -> List[np.ndarray]:
-        return [np.linspace(-np.pi, np.pi, 10000)]
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(-np.pi, np.pi, 2000)]]

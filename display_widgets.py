@@ -25,7 +25,7 @@ class ParamEqDisplayWidget(QWidget):
         self.setMouseTracking(True)
 
         self.param_eq = None
-        self.points = None
+        self.curves = None
 
         self.transform_scale = QTransform()
         self.transform_move = QTransform()
@@ -33,11 +33,12 @@ class ParamEqDisplayWidget(QWidget):
         self.transform_move.scale(1, -1)
         self.prev_moved = None
 
-        self.interval = 100
+        self.transform_scale.scale(100, 100)
+        self.interval = 1
 
     def set_param_eq(self, param_eq_type, *args, do_repaint=True):
         self.param_eq = param_eq_type(*args)
-        self.points = self.param_eq.get_points()
+        self.curves = self.param_eq.get_curves()
         if do_repaint:
             self.repaint()
 
@@ -45,7 +46,7 @@ class ParamEqDisplayWidget(QWidget):
         if self.param_eq is None:
             raise RuntimeError('Parametric equation is None!')
         setattr(self.param_eq, key, value)
-        self.points = self.param_eq.get_points()
+        self.curves = self.param_eq.get_curves()
         if do_repaint:
             self.repaint()
 
@@ -180,13 +181,14 @@ class ParamEqDisplayWidget(QWidget):
         # Draw Param Eq
         painter.setPen(QPen(QColor(255, 0, 0), 3))
 
-        if self.points is not None:
-            path = QPainterPath()
-            path.moveTo(self.calc_real_coord(QPointF(*self.points[0])))
-            for i in range(1, len(self.points)):
-                path.lineTo(self.calc_real_coord(QPointF(*self.points[i])))
+        if self.curves is not None:
+            for curve in self.curves:
+                path = QPainterPath()
+                path.moveTo(self.calc_real_coord(QPointF(*curve[0])))
+                for i in range(1, len(curve)):
+                    path.lineTo(self.calc_real_coord(QPointF(*curve[i])))
 
-            painter.drawPath(path)
+                painter.drawPath(path)
 
         # Draw border
         border_width = 5
