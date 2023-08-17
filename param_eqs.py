@@ -27,14 +27,14 @@ class LineParamEq(ParamEq):
         ]
 
     def param_values(self) -> List[List[np.ndarray]]:
-        return [[np.array([-10000, 10000])]]
+        return [[np.array([-1000, 1000])]]
 
 
 class CircleParamEq(ParamEq):
-    def __init__(self, r, x0, y0):
-        self.r = r
+    def __init__(self, x0, y0, r):
         self.x0 = x0
         self.y0 = y0
+        self.r = r
 
     def eq(self, thetas) -> List[np.ndarray]:
         return [
@@ -47,7 +47,7 @@ class CircleParamEq(ParamEq):
 
 
 class HyperbolaParamEq(ParamEq):
-    def __init__(self, a, b, x0, y0):
+    def __init__(self, x0, y0, a, b):
         self.a = a
         self.b = b
         self.x0 = x0
@@ -92,7 +92,7 @@ class HypotrochoidParamEq(ParamEq):
         ]
 
     def param_values(self) -> List[List[np.ndarray]]:
-        return [[np.linspace(0, self.R * self.k * 2 * np.pi / np.gcd(int(self.R), int(self.k * self.R)), 10000)]]
+        return [[np.linspace(0, 2 * np.pi * 100 / np.gcd(100, int((1 - self.k)/self.k * 100)), 3000)]]
 
 
 class RoseCurveParamEq(ParamEq):
@@ -111,20 +111,21 @@ class RoseCurveParamEq(ParamEq):
 
 
 class LissajousParamEq(ParamEq):
-    def __init__(self, n, phi, a, b):
-        self.n = n
-        self.phi = phi
+    def __init__(self, a, b, p, q, phi):
         self.a = a
         self.b = b
+        self.p = p
+        self.q = q
+        self.phi = phi
 
     def eq(self, ts) -> List[np.ndarray]:
         return [
-            self.a * np.sin(ts),
-            self.b * np.sin(self.n * ts + self.phi)
+            self.a * np.sin(self.p * ts),
+            self.b * np.sin(self.q * ts + self.phi)
         ]
 
     def param_values(self) -> List[List[np.ndarray]]:
-        return [[np.linspace(0, 2 * np.pi * np.lcm(int(self.n * 100), 100) / int(self.n * 100), 2000)]]
+        return [[np.linspace(0, 2 * np.pi * 100 / np.gcd(int(self.p * 100), int(self.q * 100)), 2000)]]
 
 
 class Extra1ParamEq(ParamEq):
