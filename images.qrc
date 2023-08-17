@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>images/Line.png</file>
+        <file>images/Circle.png</file>
+        <file>images/Hyperbola.png</file>
+        <file>images/Lemniscate.png</file>
+        <file>images/Hypotrochoid.png</file>
+        <file>images/Epitrochoid.png</file>
+        <file>images/Rose Curve.png</file>
+        <file>images/Lissajous.png</file>
+        <file>images/Extra 1.png</file>
+    </qresource>
+</RCC>

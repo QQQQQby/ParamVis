@@ -9,7 +9,9 @@ from PySide2.QtWidgets import QMainWindow, QWidget, QMenuBar, QStatusBar, QAppli
 from display_widgets import ParamEqDisplayWidget
 from option_widgets import OptionWidget
 from param_eqs import LineParamEq, CircleParamEq, HyperbolaParamEq, LemniscateParamEq, HypotrochoidParamEq, \
-    RoseCurveParamEq, LissajousParamEq, Extra1ParamEq
+    RoseCurveParamEq, LissajousParamEq, Extra1ParamEq, EpitrochoidParamEq
+
+import images
 
 
 class MainWindow(QMainWindow):
@@ -34,8 +36,13 @@ class MainWindow(QMainWindow):
             ['a', 'a:', 0.5, 500, 0.5, 1]
         ]),
         ('Hypotrochoid', HypotrochoidParamEq, [
-            ['R', 'R:', 0.5, 500, 1, 1],
-            ['k', 'k:', 0.01, 0.99, 0.01, 0.5],
+            ['R', 'R:', 0.5, 500, 1, 2],
+            ['r', 'r:', 0.5, 500, 1, 1],
+            ['l', 'l:', 0, 2, 0.05, 0]
+        ]),
+        ('Epitrochoid', EpitrochoidParamEq, [
+            ['R', 'R:', 0.5, 500, 1, 2],
+            ['r', 'r:', 0.5, 500, 1, 1],
             ['l', 'l:', 0, 2, 0.05, 0]
         ]),
         ('Rose Curve', RoseCurveParamEq, [
@@ -53,7 +60,7 @@ class MainWindow(QMainWindow):
             ['a', 'a:', 1, 50, 0.05, 1]
         ])
     ]
-    label_eq_image_height = 160
+    label_eq_image_height = 200
 
     def __init__(self):
         super().__init__()
@@ -80,7 +87,7 @@ class MainWindow(QMainWindow):
         # declaration of parametric equation
         self.label_eq_image = QLabel(self)
         self.label_eq_image.setMinimumHeight(self.label_eq_image_height)
-        self.label_eq_image.setPixmap(QPixmap('images/' + MainWindow.options[0][0] + '.png')
+        self.label_eq_image.setPixmap(QPixmap(':/images/' + MainWindow.options[0][0] + '.png')
                                       .scaledToHeight(self.label_eq_image_height))
         eq_image_layout = QHBoxLayout()
         eq_image_layout.addStretch(1)
@@ -103,7 +110,7 @@ class MainWindow(QMainWindow):
         self.central_widget.setLayout(layout)
 
     def on_choice_changed(self, idx):
-        self.label_eq_image.setPixmap(QPixmap('images/' + MainWindow.options[idx][0] + '.png')
+        self.label_eq_image.setPixmap(QPixmap(':/images/' + MainWindow.options[idx][0] + '.png')
                                       .scaledToHeight(self.label_eq_image_height))
         self.option_widget.set_param_eq_option(MainWindow.options[idx])
 

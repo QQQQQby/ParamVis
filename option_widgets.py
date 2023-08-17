@@ -1,4 +1,5 @@
 from PySide2.QtCore import Qt
+from PySide2.QtGui import QFont
 from PySide2.QtWidgets import QWidget, QLabel, QHBoxLayout, QGridLayout, QDoubleSpinBox
 
 from custom_widgets import DoubleSlider
@@ -23,12 +24,15 @@ class OptionWidget(QWidget):
             item_layout.addStretch(1)
 
             label = QLabel(self)
+            label.setFont(QFont('Times New Romans', 18, QFont.Bold))
             label.setText(arg[1])
             item_layout.addWidget(label)
 
             slider = DoubleSlider(self)
             spinbox = QDoubleSpinBox(self)
 
+            slider.setFixedWidth(200)
+            slider.setFixedHeight(30)
             slider.setOrientation(Qt.Orientation.Horizontal)
             slider.setMinimum(arg[2])
             slider.setMaximum(arg[3])
@@ -36,6 +40,7 @@ class OptionWidget(QWidget):
             slider.setValue(arg[5])
             item_layout.addWidget(slider)
 
+            spinbox.setFont(QFont('Times New Romans', 18))
             spinbox.setMinimum(arg[2])
             spinbox.setMaximum(arg[3])
             spinbox.setSingleStep(arg[4])
@@ -44,7 +49,7 @@ class OptionWidget(QWidget):
 
             item_layout.addStretch(1)
 
-            self.main_layout.addLayout(item_layout, i // 4, i % 4)
+            self.main_layout.addLayout(item_layout, i // 3, i % 3)
 
             slider.doubleValueChanged.connect(self._make_slider_callback(arg[0], spinbox))
             spinbox.valueChanged.connect(self._make_spinbox_callback(arg[0], slider))

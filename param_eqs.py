@@ -60,8 +60,8 @@ class HyperbolaParamEq(ParamEq):
         ]
 
     def param_values(self) -> List[List[np.ndarray]]:
-        return [[np.linspace(-np.pi / 2 + 1e-6, np.pi / 2 - 1e-6, 1000)],
-                [np.linspace(np.pi / 2 + 1e-6, np.pi * 3 / 2 - 1e-6, 1000)]]
+        return [[np.linspace(-np.pi / 2 + 1e-12, np.pi / 2 - 1e-12, 1000)],
+                [np.linspace(np.pi / 2 + 1e-12, np.pi * 3 / 2 - 1e-12, 1000)]]
 
 
 class LemniscateParamEq(ParamEq):
@@ -80,19 +80,35 @@ class LemniscateParamEq(ParamEq):
 
 
 class HypotrochoidParamEq(ParamEq):
-    def __init__(self, R, k, l):
+    def __init__(self, R, r, l):
         self.R = R
-        self.k = k
+        self.r = r
         self.l = l
 
     def eq(self, thetas) -> List[np.ndarray]:
         return [
-            self.R * ((1 - self.k) * np.cos(thetas) + self.l * self.k * np.cos((1 - self.k) / self.k * thetas)),
-            self.R * ((1 - self.k) * np.sin(thetas) + self.l * self.k * np.sin((1 - self.k) / self.k * thetas))
+            (self.R - self.r) * np.cos(thetas) + self.l * self.r * np.cos((self.R - self.r) / self.r * thetas),
+            (self.R - self.r) * np.sin(thetas) - self.l * self.r * np.sin((self.R - self.r) / self.r * thetas)
         ]
 
     def param_values(self) -> List[List[np.ndarray]]:
-        return [[np.linspace(0, 2 * np.pi * 100 / np.gcd(100, int((1 - self.k)/self.k * 100)), 3000)]]
+        return [[np.linspace(0, 2 * np.pi * self.r, 3000)]]
+
+
+class EpitrochoidParamEq(ParamEq):
+    def __init__(self, R, r, l):
+        self.R = R
+        self.r = r
+        self.l = l
+
+    def eq(self, thetas) -> List[np.ndarray]:
+        return [
+            (self.R + self.r) * np.cos(thetas) - self.l * self.r * np.cos((self.R + self.r) / self.r * thetas),
+            (self.R + self.r) * np.sin(thetas) - self.l * self.r * np.sin((self.R + self.r) / self.r * thetas)
+        ]
+
+    def param_values(self) -> List[List[np.ndarray]]:
+        return [[np.linspace(0, 2 * np.pi * self.r, 3000)]]
 
 
 class RoseCurveParamEq(ParamEq):
